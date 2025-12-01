@@ -20,4 +20,4 @@ app.get("/api/healthz", handlerReadiness);
 
 app.get("/admin/metrics", handlerMetrics);
 
-app.get("/admin/reset", handlerReset);
+app.post("/admin/reset", handlerReset);
