@@ -4,6 +4,7 @@ import { logResponses } from "./lib/middleware/logResponses.js";
 import { requestMetrics } from "./lib/middleware/metrics.js";
 import { handlerMetrics } from "./lib/handler/metrics.js";
 import { handlerReset } from "./lib/handler/reset.js";
+import { handlerValidateChirp } from "./lib/handler/validateChirp.js";
 
 const app = express();
 const PORT = 8080;
@@ -21,3 +22,5 @@ app.get("/api/healthz", handlerReadiness);
 app.get("/admin/metrics", handlerMetrics);
 
 app.post("/admin/reset", handlerReset);
+
+app.post("/api/validate_chirp", handlerValidateChirp);
