@@ -23,4 +23,4 @@ app.get("/admin/metrics", handlerMetrics);
 
 app.post("/admin/reset", handlerReset);
 
-app.post("/api/validate_chirp", handlerValidateChirp);
+app.post("/api/validate_chirp", express.json(), handlerValidateChirp);
