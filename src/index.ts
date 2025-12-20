@@ -5,6 +5,7 @@ import { requestMetrics } from "./lib/middleware/metrics.js";
 import { handlerMetrics } from "./lib/handler/metrics.js";
 import { handlerReset } from "./lib/handler/reset.js";
 import { handlerValidateChirp } from "./lib/handler/validateChirp.js";
+import { handlerError } from "./lib/handler/error.js";
 
 const app = express();
 const PORT = 8080;
@@ -24,3 +25,6 @@ app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerReset);
 
 app.post("/api/validate_chirp", express.json(), handlerValidateChirp);
+
+// this needs to be last
+app.use(handlerError);
