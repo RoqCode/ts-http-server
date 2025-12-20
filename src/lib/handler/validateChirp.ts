@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { BadRequestError } from "../errors/errors.js";
 
 const badWords = ["kerfuffle", "sharbert", "fornax"];
 
@@ -6,11 +7,11 @@ export function handlerValidateChirp(req: Request, res: Response) {
   const { body } = req.body ?? {};
 
   if (typeof body !== "string") {
-    throw new Error("Invalid JSON");
+    throw new BadRequestError("Invalid JSON");
   }
 
   if (body.length > 140) {
-    throw new Error("Chirp is too long");
+    throw new BadRequestError("Chirp is too long. Max length is 140");
   } else {
     res.status(200).send({
       cleanedBody: cleanBody(body),
