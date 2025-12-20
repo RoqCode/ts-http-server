@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { apiConfig } from "../config.js";
+import { config } from "../config.js";
 
 export function requestMetrics(
   _req: Request,
   _res: Response,
   next: NextFunction,
 ) {
-  apiConfig.fileserverHits++;
+  config.fileserverHits++;
   next();
 }

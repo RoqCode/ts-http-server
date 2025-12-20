@@ -11,7 +11,7 @@ type APIConfig = {
   db: DBConfig;
 };
 
-export const apiConfig: APIConfig = {
+export const config: APIConfig = {
   fileserverHits: 0,
   db: {
     url: process.env.DB_URL as string,

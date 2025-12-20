@@ -9,10 +9,11 @@ import { handlerReset } from "./lib/handler/reset.js";
 import { handlerValidateChirp } from "./lib/handler/validateChirp.js";
 import { logResponses } from "./lib/middleware/logResponses.js";
 import { requestMetrics } from "./lib/middleware/metrics.js";
-import { apiConfig } from "./lib/config.js";
+import { config } from "./lib/config.js";
+import { handlerUsers } from "./lib/handler/user.js";
 
-const migrationClient = postgres(apiConfig.db.url, { max: 1 });
-await migrate(drizzle(migrationClient), apiConfig.db.migrationConfig);
+const migrationClient = postgres(config.db.url, { max: 1 });
+await migrate(drizzle(migrationClient), config.db.migrationConfig);
 
 const app = express();
 const PORT = 8080;
@@ -29,9 +30,15 @@ app.get("/api/healthz", handlerReadiness);
 
 app.get("/admin/metrics", handlerMetrics);
 
-app.post("/admin/reset", handlerReset);
+app.post("/admin/reset", (req, res, next) => {
+  handlerReset(req, res).catch(next);
+});
 
 app.post("/api/validate_chirp", express.json(), handlerValidateChirp);
+
+app.post("/api/users", express.json(), (req, res, next) => {
+  handlerUsers(req, res).catch(next);
+});
 
 // this needs to be last
 app.use(handlerError);
