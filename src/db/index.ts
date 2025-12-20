@@ -4,5 +4,5 @@ import postgres from "postgres";
 import * as schema from "./schema.js";
 import { apiConfig } from "../lib/config.js";
 
-const conn = postgres(apiConfig.dbUrl);
+const conn = postgres(apiConfig.db.url);
 export const db = drizzle(conn, { schema });
