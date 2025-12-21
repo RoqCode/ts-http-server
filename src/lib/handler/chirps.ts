@@ -34,3 +34,15 @@ function validateRequest(req: Request) {
 
   return { body, userId };
 }
+
+export async function handlerChirpsBatch(_req: Request, res: Response) {
+  try {
+    const results = await db.select().from(chirps);
+
+    if (results.length === 0) console.warn("no chirps in database");
+
+    res.status(200).json(results);
+  } catch (err) {
+    throw err;
+  }
+}
