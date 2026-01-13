@@ -9,6 +9,7 @@ import {
   handlerChirpsBatch,
 } from "./lib/handler/chirps.js";
 import { handlerError } from "./lib/handler/error.js";
+import { handlerLogin } from "./lib/handler/login.js";
 import { handlerMetrics } from "./lib/handler/metrics.js";
 import { handlerReadiness } from "./lib/handler/readiness.js";
 import { handlerReset } from "./lib/handler/reset.js";
@@ -40,6 +41,10 @@ app.post("/admin/reset", (req, res, next) => {
 
 app.post("/api/users", express.json(), (req, res, next) => {
   handlerUsers(req, res).catch(next);
+});
+
+app.post("/api/login", express.json(), (req, res, next) => {
+  handlerLogin(req, res).catch(next);
 });
 
 app.post("/api/chirps", express.json(), (req, res, next) => {
