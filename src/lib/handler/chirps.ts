@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { handlerValidateChirp } from "./validateChirp.js";
-import { BadRequestError } from "../errors/errors.js";
+import { BadRequestError, NotFoundError } from "../errors/errors.js";
 import { db } from "../../db/index.js";
 import { chirps } from "../../db/schema.js";
+import { eq } from "drizzle-orm";
 
 export async function handlerChirps(req: Request, res: Response) {
   const { body, userId } = validateRequest(req);
@@ -42,6 +43,25 @@ export async function handlerChirpsBatch(_req: Request, res: Response) {
     if (results.length === 0) console.warn("no chirps in database");
 
     res.status(200).json(results);
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function handlerChirp(req: Request, res: Response) {
+  const chirpId = req.params.chirpId;
+
+  try {
+    const [chirp] = await db
+      .select()
+      .from(chirps)
+      .where(eq(chirps.id, chirpId));
+
+    if (!chirp) {
+      throw new NotFoundError(`no chirp with id ${chirpId} in database`);
+    }
+
+    res.status(200).json(chirp);
   } catch (err) {
     throw err;
   }

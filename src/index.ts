@@ -3,7 +3,11 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import express from "express";
 import postgres from "postgres";
 import { config } from "./lib/config.js";
-import { handlerChirps, handlerChirpsBatch } from "./lib/handler/chirps.js";
+import {
+  handlerChirp,
+  handlerChirps,
+  handlerChirpsBatch,
+} from "./lib/handler/chirps.js";
 import { handlerError } from "./lib/handler/error.js";
 import { handlerMetrics } from "./lib/handler/metrics.js";
 import { handlerReadiness } from "./lib/handler/readiness.js";
@@ -44,6 +48,10 @@ app.post("/api/chirps", express.json(), (req, res, next) => {
 
 app.get("/api/chirps", express.json(), (req, res, next) => {
   handlerChirpsBatch(req, res).catch(next);
+});
+
+app.get("/api/chirps/:chirpId", express.json(), (req, res, next) => {
+  handlerChirp(req, res).catch(next);
 });
 
 // this needs to be last
