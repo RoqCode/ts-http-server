@@ -2,6 +2,7 @@ import * as argon2 from "argon2";
 import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { BadRequestError } from "./errors/errors.js";
+import * as crypto from "node:crypto";
 
 type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -44,8 +45,7 @@ export function validateJWT(tokenString: string, secret: string): string {
     }
 
     return token.sub;
-  } catch (e) {
-    console.warn(e);
+  } catch (_) {
     throw new BadRequestError("token could not be verified");
   }
 }
@@ -55,8 +55,13 @@ export function getBearerToken(req: Request): string {
   if (!authHeader) throw new BadRequestError("authorization header missing");
 
   const trimmed = authHeader.trim();
-  if (!trimmed.toLowerCase().startsWith("bearer "))
+  if (!trimmed.toLowerCase().startsWith("bearer ")) {
     throw new BadRequestError("authorization header is malformed");
+  }
 
   return trimmed.slice(7).trim();
+}
+
+export function makeRefreshToken() {
+  return crypto.randomBytes(256).toString("hex");
 }

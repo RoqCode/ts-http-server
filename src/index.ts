@@ -12,7 +12,9 @@ import { handlerError } from "./lib/handler/error.js";
 import { handlerLogin } from "./lib/handler/login.js";
 import { handlerMetrics } from "./lib/handler/metrics.js";
 import { handlerReadiness } from "./lib/handler/readiness.js";
+import { handlerRefresh } from "./lib/handler/refresh.js";
 import { handlerReset } from "./lib/handler/reset.js";
+import { handlerRevoke } from "./lib/handler/revoke.js";
 import { handlerUsers } from "./lib/handler/user.js";
 import { logResponses } from "./lib/middleware/logResponses.js";
 import { requestMetrics } from "./lib/middleware/metrics.js";
@@ -64,6 +66,14 @@ app.get(
     handlerChirp(req, res).catch(next);
   },
 );
+
+app.post("/api/refresh", express.json(), (req, res, next) => {
+  handlerRefresh(req, res).catch(next);
+});
+
+app.post("/api/revoke", express.json(), (req, res, next) => {
+  handlerRevoke(req, res).catch(next);
+});
 
 // this needs to be last
 app.use(handlerError);

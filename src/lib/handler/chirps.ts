@@ -31,8 +31,6 @@ function validateRequest(req: Request) {
   const userId = req.userId;
 
   if (typeof body !== "string" || typeof userId !== "string") {
-    console.log("---------------------------");
-    console.log(body, userId);
     throw new BadRequestError("Malformed request body");
   }
 

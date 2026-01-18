@@ -13,14 +13,8 @@ export function validateUserRequest(req: Request): ValidatedRequest {
   if (!req.body?.password && typeof req.body.password != "string")
     throw new BadRequestError("no password in request");
 
-  const maybeEIS: string | number | undefined = req.body.expiresInSeconds;
-
-  const expiresInSeconds =
-    typeof maybeEIS === "string" ? parseInt(maybeEIS, 10) : maybeEIS;
-
   return {
     email: req.body.email,
     password: req.body.password,
-    ...(expiresInSeconds !== undefined && { expiresInSeconds }),
   };
 }

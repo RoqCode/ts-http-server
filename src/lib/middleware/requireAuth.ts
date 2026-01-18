@@ -7,6 +7,7 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction) {
   let jwtUserId: string;
   try {
     const token = getBearerToken(req);
+
     jwtUserId = validateJWT(token, config.jwtSecret);
   } catch (e) {
     throw new UnauthorizedError();
