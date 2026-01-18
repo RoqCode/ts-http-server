@@ -27,9 +27,12 @@ function validateRequest(req: Request) {
     throw new BadRequestError("Request body must be an object");
   }
 
-  const { body, userId } = req.body as Record<string, unknown>;
+  const { body } = req.body as Record<string, unknown>;
+  const userId = req.userId;
 
   if (typeof body !== "string" || typeof userId !== "string") {
+    console.log("---------------------------");
+    console.log(body, userId);
     throw new BadRequestError("Malformed request body");
   }
 

@@ -1,4 +1,5 @@
 import * as argon2 from "argon2";
+import { Request } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { BadRequestError } from "./errors/errors.js";
 
@@ -47,4 +48,15 @@ export function validateJWT(tokenString: string, secret: string): string {
     console.warn(e);
     throw new BadRequestError("token could not be verified");
   }
+}
+
+export function getBearerToken(req: Request): string {
+  const authHeader = req.get("authorization");
+  if (!authHeader) throw new BadRequestError("authorization header missing");
+
+  const trimmed = authHeader.trim();
+  if (!trimmed.toLowerCase().startsWith("bearer "))
+    throw new BadRequestError("authorization header is malformed");
+
+  return trimmed.slice(7).trim();
 }

@@ -16,6 +16,7 @@ import { handlerReset } from "./lib/handler/reset.js";
 import { handlerUsers } from "./lib/handler/user.js";
 import { logResponses } from "./lib/middleware/logResponses.js";
 import { requestMetrics } from "./lib/middleware/metrics.js";
+import { requireAuth } from "./lib/middleware/requireAuth.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -47,17 +48,22 @@ app.post("/api/login", express.json(), (req, res, next) => {
   handlerLogin(req, res).catch(next);
 });
 
-app.post("/api/chirps", express.json(), (req, res, next) => {
+app.post("/api/chirps", express.json(), requireAuth, (req, res, next) => {
   handlerChirps(req, res).catch(next);
 });
 
-app.get("/api/chirps", express.json(), (req, res, next) => {
+app.get("/api/chirps", express.json(), requireAuth, (req, res, next) => {
   handlerChirpsBatch(req, res).catch(next);
 });
 
-app.get("/api/chirps/:chirpId", express.json(), (req, res, next) => {
-  handlerChirp(req, res).catch(next);
-});
+app.get(
+  "/api/chirps/:chirpId",
+  express.json(),
+  requireAuth,
+  (req, res, next) => {
+    handlerChirp(req, res).catch(next);
+  },
+);
 
 // this needs to be last
 app.use(handlerError);

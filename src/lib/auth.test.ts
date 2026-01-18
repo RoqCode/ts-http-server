@@ -5,6 +5,7 @@ import {
   checkPasswordHash,
   makeJWT,
   validateJWT,
+  getBearerToken,
 } from "./auth.js";
 
 describe("Password Hashing", () => {
@@ -82,6 +83,44 @@ describe("JWT", () => {
 
     expect(() => validateJWT(expiredToken, secret)).toThrow(
       "token could not be verified",
+    );
+  });
+});
+
+describe("getBearerToken", () => {
+  it("should return the token from a valid bearer header", () => {
+    const req = {
+      get: vi.fn().mockReturnValue("Bearer abc.def.ghi"),
+    };
+
+    expect(getBearerToken(req as never)).toBe("abc.def.ghi");
+  });
+
+  it("should trim and accept case-insensitive bearer prefix", () => {
+    const req = {
+      get: vi.fn().mockReturnValue("  bEaReR   token-123  "),
+    };
+
+    expect(getBearerToken(req as never)).toBe("token-123");
+  });
+
+  it("should reject missing authorization header", () => {
+    const req = {
+      get: vi.fn().mockReturnValue(undefined),
+    };
+
+    expect(() => getBearerToken(req as never)).toThrow(
+      "authorization header missing",
+    );
+  });
+
+  it("should reject malformed authorization header", () => {
+    const req = {
+      get: vi.fn().mockReturnValue("Token abc123"),
+    };
+
+    expect(() => getBearerToken(req as never)).toThrow(
+      "authorization header is malformed",
     );
   });
 });

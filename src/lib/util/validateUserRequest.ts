@@ -1,11 +1,26 @@
 import { BadRequestError } from "../errors/errors.js";
 import { Request } from "express";
 
-export function validateUserRequest(req: Request) {
+type ValidatedRequest = {
+  email: string;
+  password: string;
+  expiresInSeconds?: number;
+};
+
+export function validateUserRequest(req: Request): ValidatedRequest {
   if (!req.body?.email && typeof req.body.email != "string")
     throw new BadRequestError("no email in request");
   if (!req.body?.password && typeof req.body.password != "string")
     throw new BadRequestError("no password in request");
 
-  return { email: req.body.email, password: req.body.password };
+  const maybeEIS: string | number | undefined = req.body.expiresInSeconds;
+
+  const expiresInSeconds =
+    typeof maybeEIS === "string" ? parseInt(maybeEIS, 10) : maybeEIS;
+
+  return {
+    email: req.body.email,
+    password: req.body.password,
+    ...(expiresInSeconds !== undefined && { expiresInSeconds }),
+  };
 }

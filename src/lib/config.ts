@@ -9,6 +9,7 @@ type DBConfig = {
 type APIConfig = {
   fileserverHits: number;
   db: DBConfig;
+  jwtSecret: string;
 };
 
 export const config: APIConfig = {
@@ -19,4 +20,5 @@ export const config: APIConfig = {
       migrationsFolder: "src/db/out",
     },
   },
+  jwtSecret: process.env.JWT_SECRET as string,
 };
