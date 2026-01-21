@@ -1,15 +1,20 @@
 import { Request, Response } from "express";
 import { handlerValidateChirp } from "./validateChirp.js";
-import { BadRequestError, NotFoundError } from "../errors/errors.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../errors/errors.js";
 import { db } from "../../db/index.js";
 import { chirps } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
 
 export async function handlerChirps(req: Request, res: Response) {
   const { body, userId } = validateRequest(req);
   const { cleanedBody } = handlerValidateChirp(body);
 
-  // save chirp in bd
   try {
     const [newChirp] = await db
       .insert(chirps)
@@ -49,21 +54,40 @@ export async function handlerChirpsBatch(_req: Request, res: Response) {
   }
 }
 
-export async function handlerChirp(req: Request, res: Response) {
+export async function handlerChirpGet(req: Request, res: Response) {
   const chirpId = req.params.chirpId;
 
-  try {
-    const [chirp] = await db
-      .select()
-      .from(chirps)
-      .where(eq(chirps.id, chirpId));
+  const chirp = await getChirpById(chirpId);
 
-    if (!chirp) {
-      throw new NotFoundError(`no chirp with id ${chirpId} in database`);
-    }
+  res.status(200).json(chirp);
+}
 
-    res.status(200).json(chirp);
-  } catch (err) {
-    throw err;
+export async function handlerChirpDelete(req: Request, res: Response) {
+  const chirpId = req.params.chirpId;
+  const token = getBearerToken(req);
+  const userId = validateJWT(token, config.jwtSecret);
+
+  const chirp = await getChirpById(chirpId);
+
+  if (chirp.userId !== userId)
+    throw new ForbiddenError("userId does not match chirpId");
+
+  const [deletedChirp] = await db
+    .delete(chirps)
+    .where(eq(chirps.id, chirpId))
+    .returning();
+  if (!deletedChirp) {
+    throw new NotFoundError(`no chirp found to be deleted`);
   }
+
+  res.sendStatus(204);
+}
+
+async function getChirpById(id: string) {
+  const [chirp] = await db.select().from(chirps).where(eq(chirps.id, id));
+  if (!chirp) {
+    throw new NotFoundError(`no chirp with id ${id} in database`);
+  }
+
+  return chirp;
 }

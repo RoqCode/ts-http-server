@@ -5,7 +5,8 @@ import postgres from "postgres";
 import { config } from "./lib/config.js";
 import { handlerChangeCredentials } from "./lib/handler/changeCredentials.js";
 import {
-  handlerChirp,
+  handlerChirpDelete,
+  handlerChirpGet,
   handlerChirps,
   handlerChirpsBatch,
 } from "./lib/handler/chirps.js";
@@ -59,16 +60,20 @@ app.post("/api/chirps", express.json(), requireAuth, (req, res, next) => {
   handlerChirps(req, res).catch(next);
 });
 
-app.get("/api/chirps", express.json(), requireAuth, (req, res, next) => {
+app.get("/api/chirps", express.json(), (req, res, next) => {
   handlerChirpsBatch(req, res).catch(next);
 });
 
-app.get(
+app.get("/api/chirps/:chirpId", express.json(), (req, res, next) => {
+  handlerChirpGet(req, res).catch(next);
+});
+
+app.delete(
   "/api/chirps/:chirpId",
   express.json(),
   requireAuth,
   (req, res, next) => {
-    handlerChirp(req, res).catch(next);
+    handlerChirpDelete(req, res).catch(next);
   },
 );
 
