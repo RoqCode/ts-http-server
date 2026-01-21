@@ -3,6 +3,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import express from "express";
 import postgres from "postgres";
 import { config } from "./lib/config.js";
+import { handlerChangeCredentials } from "./lib/handler/changeCredentials.js";
 import {
   handlerChirp,
   handlerChirps,
@@ -44,6 +45,10 @@ app.post("/admin/reset", (req, res, next) => {
 
 app.post("/api/users", express.json(), (req, res, next) => {
   handlerUsers(req, res).catch(next);
+});
+
+app.put("/api/users", express.json(), requireAuth, (req, res, next) => {
+  handlerChangeCredentials(req, res).catch(next);
 });
 
 app.post("/api/login", express.json(), (req, res, next) => {

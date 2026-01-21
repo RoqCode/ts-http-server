@@ -19,7 +19,6 @@ export async function handlerLogin(req: Request, res: Response) {
 
   const isCorrect = await checkPasswordHash(password, result.hashedPassword);
   if (!isCorrect) throw new UnauthorizedError("password was not correct");
-  console.log("Successfully logged in!");
   const { hashedPassword, ...userObject } = result;
 
   const jwt = makeJWT(userObject.id, ONE_HOUR, config.jwtSecret);
