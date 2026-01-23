@@ -42,9 +42,17 @@ function validateRequest(req: Request) {
   return { body, userId };
 }
 
-export async function handlerChirpsBatch(_req: Request, res: Response) {
+export async function handlerChirpsBatch(req: Request, res: Response) {
+  const { authorId } = req.query;
+
+  let authorIdString = undefined;
+  if (typeof authorId === "string") authorIdString = authorId;
+
   try {
-    const results = await db.select().from(chirps);
+    const results = await db
+      .select()
+      .from(chirps)
+      .where(authorIdString ? eq(chirps.userId, authorIdString) : undefined);
 
     if (results.length === 0) console.warn("no chirps in database");
 
