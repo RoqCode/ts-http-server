@@ -22,6 +22,7 @@ import { logResponses } from "./lib/middleware/logResponses.js";
 import { requestMetrics } from "./lib/middleware/metrics.js";
 import { requireAuth } from "./lib/middleware/requireAuth.js";
 import { handlerUpgradeUser } from "./lib/handler/upgradeUser.js";
+import { requireAPIKey } from "./lib/middleware/requireAPIKey.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -86,9 +87,14 @@ app.post("/api/revoke", express.json(), (req, res, next) => {
   handlerRevoke(req, res).catch(next);
 });
 
-app.post("/api/polka/webhooks", express.json(), (req, res, next) => {
-  handlerUpgradeUser(req, res).catch(next);
-});
+app.post(
+  "/api/polka/webhooks",
+  express.json(),
+  requireAPIKey,
+  (req, res, next) => {
+    handlerUpgradeUser(req, res).catch(next);
+  },
+);
 
 // this needs to be last
 app.use(handlerError);

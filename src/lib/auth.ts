@@ -65,3 +65,15 @@ export function getBearerToken(req: Request): string {
 export function makeRefreshToken() {
   return crypto.randomBytes(256).toString("hex");
 }
+
+export function getAPIKey(req: Request) {
+  const authHeader = req.get("authorization");
+  if (!authHeader) throw new BadRequestError("authorization header missing");
+
+  const trimmed = authHeader.trim();
+  if (!trimmed.toLowerCase().startsWith("apikey ")) {
+    throw new BadRequestError("authorization header is malformed");
+  }
+
+  return trimmed.slice(7).trim();
+}
