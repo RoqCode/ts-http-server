@@ -15,6 +15,7 @@ export async function handlerUsers(req: Request, res: Response) {
       .returning({
         id: users.id,
         email: users.email,
+        isChirpyRed: users.isChirpyRed,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       });
