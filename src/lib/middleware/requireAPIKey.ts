@@ -10,7 +10,8 @@ export function requireAPIKey(
 ) {
   try {
     const apiKey = getAPIKey(req);
-    if (!apiKey) throw new UnauthorizedError();
+    if (!apiKey || apiKey !== process.env.POLKA_KEY)
+      throw new UnauthorizedError();
   } catch (e) {
     throw new UnauthorizedError();
   }
