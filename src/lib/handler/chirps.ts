@@ -1,15 +1,15 @@
+import { asc, desc, eq } from "drizzle-orm";
 import { Request, Response } from "express";
-import { handlerValidateChirp } from "./validateChirp.js";
+import { db } from "../../db/index.js";
+import { chirps } from "../../db/schema.js";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../errors/errors.js";
-import { db } from "../../db/index.js";
-import { chirps } from "../../db/schema.js";
-import { eq } from "drizzle-orm";
-import { getBearerToken, validateJWT } from "../auth.js";
-import { config } from "../config.js";
+import { handlerValidateChirp } from "./validateChirp.js";
 
 export async function handlerChirps(req: Request, res: Response) {
   const { body, userId } = validateRequest(req);
@@ -42,17 +42,25 @@ function validateRequest(req: Request) {
   return { body, userId };
 }
 
-export async function handlerChirpsBatch(req: Request, res: Response) {
-  const { authorId } = req.query;
+type SortTypes = "asc" | "desc" | undefined;
 
-  let authorIdString = undefined;
-  if (typeof authorId === "string") authorIdString = authorId;
+export async function handlerChirpsBatch(req: Request, res: Response) {
+  const { authorId, sort } = req.query;
+
+  const authorIdString = typeof authorId === "string" ? authorId : undefined;
+
+  const sortString: SortTypes =
+    sort === "asc" || sort === "desc" ? sort : "desc";
+
+  const sorting =
+    sortString === "asc" ? asc(chirps.createdAt) : desc(chirps.createdAt);
 
   try {
     const results = await db
       .select()
       .from(chirps)
-      .where(authorIdString ? eq(chirps.userId, authorIdString) : undefined);
+      .where(authorIdString ? eq(chirps.userId, authorIdString) : undefined)
+      .orderBy(sorting);
 
     if (results.length === 0) console.warn("no chirps in database");
 
